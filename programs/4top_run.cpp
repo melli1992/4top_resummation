@@ -79,7 +79,8 @@ int main(int argc, char* argv[]){
 	cout << " muF = " << muF << ", muR = " << muR  << endl;
 	output << " muF = " << muF << ", muR = " << muR << endl;
 	if(LO){
-		out_result = call_vegas(init_vegas_4top("resum"),params, true, true);
+		//out_result = call_vegas(init_vegas_4top("resum"),params, true, true);
+		out_result = call_vegas(init_vegas_4top("LO"),params, true, true);
 		cout << "Res: " << out_result.res << " " << out_result.err << endl;
 		output << "Res: " << out_result.res << " " << out_result.err << endl;
 	}

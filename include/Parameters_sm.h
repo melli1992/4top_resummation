@@ -10,7 +10,6 @@
 
 #include <complex> 
 
-#include "read_slha.h"
 using namespace std; 
 
 class Parameters_sm
@@ -36,10 +35,10 @@ class Parameters_sm
     // Model couplings independent of aS
 
     // Model couplings dependent on aS
-    std::complex<double> GC_10, GC_11; 
+    std::complex<double> GC_10, GC_11, GC_12; 
 
     // Set parameters that are unchanged during the run
-    void setIndependentParameters(SLHAReader& slha); 
+    void setIndependentParameters(); 
     // Set couplings that are unchanged during the run
     void setIndependentCouplings(); 
     // Set parameters that are changed event by event

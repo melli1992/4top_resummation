@@ -5,39 +5,39 @@
 // Visit launchpad.net/madgraph5 and amcatnlo.web.cern.ch
 //==========================================================================
 
-#ifndef MG5_Sigma_sm_uux_ttxttx_H
-#define MG5_Sigma_sm_uux_ttxttx_H
+#ifndef MG5_Sigma_sm_gg_ttxttx_H
+#define MG5_Sigma_sm_gg_ttxttx_H
 
-#include <complex>
-#include <vector>
+#include <complex> 
+#include <vector> 
 
 #include "Parameters_sm.h"
 
-using namespace std;
+using namespace std; 
 
 //==========================================================================
 // A class for calculating the matrix elements for
-// Process: u u~ > t t~ t t~ WEIGHTED<=4 @1
+// Process: g g > t t~ t t~ WEIGHTED<=4 @1
 //--------------------------------------------------------------------------
 
-class qq_process
+class gg_process
 {
   public:
 
     // Constructor.
-    qq_process() {}
+    gg_process() {}
 
     // Initialize process.
-    virtual void initProc();
+    virtual void initProc(); 
 
     // Calculate flavour-independent parts of cross section.
-    virtual void sigmaKin();
+    virtual void sigmaKin(); 
 
     // Evaluate sigmaHat(sHat).
-    //virtual double sigmaHat();
+    // virtual double sigmaHat();
 
     // Info on the subprocess.
-    virtual string name() const {return "u u~ > t t~ t t~ (sm)";}
+    virtual string name() const {return "g g > t t~ t t~ (sm)";}
 
     virtual int code() const {return 1;}
 
@@ -54,43 +54,43 @@ class qq_process
     const double * getMatrixElements() const {return matrix_element[0];}
 
     // Constants for array limits
-    static const int ncol = 6;
-    static const int ninitial = 2;
-    static const int nexternal = 6;
-    static const int nprocesses = 1;
+    static const int ncol = 14; 
+    static const int ninitial = 2; 
+    static const int nexternal = 6; 
+    static const int nprocesses = 1; 
 
   private:
 
     // Private functions to calculate the matrix element for all subprocesses
     // Calculate wavefunctions
-    void calculate_wavefunctions(const int perm[], const int hel[]);
-    static const int nwavefuncs = 19;
-    std::complex<double> w[nwavefuncs][18];
-    static const int namplitudes = 14;
-    std::complex<double> amp[namplitudes];
-    double matrix_1_uux_ttxttx();
+    void calculate_wavefunctions(const int perm[], const int hel[]); 
+    static const int nwavefuncs = 43; 
+    std::complex<double> w[nwavefuncs][18]; 
+    static const int namplitudes = 76; 
+    std::complex<double> amp[namplitudes]; 
+    double matrix_1_gg_ttxttx(); 
 
     // Store the matrix element value from sigmaKin
     // double matrix_element[nprocesses];
 
     // Store the matrix element values for each colour from sigmaKin
-    double * matrix_element[nprocesses];
+    double * matrix_element[nprocesses]; 
 
     // Color flows, used when selecting color
-    double * jamp2[nprocesses];
+    double * jamp2[nprocesses]; 
 
     // Pointer to the model parameters
-    Parameters_sm * pars;
+    Parameters_sm * pars; 
 
     // vector with external particle masses
-    vector<double> mME;
+    vector<double> mME; 
 
     // vector with momenta (to be changed each event)
-    vector < double * > p;
+    vector < double * > p; 
     // Initial particle ids
-    int id1, id2;
+    int id1, id2; 
 
-};
+}; 
 
 
-#endif  // MG5_Sigma_sm_uux_ttxttx_H
+#endif  // MG5_Sigma_sm_gg_ttxttx_H

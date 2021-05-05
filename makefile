@@ -29,9 +29,9 @@ RESUM_OBJS := $(RESUM_OBJS) src/MC/monte_carlo.o src/MC/4top_vegas.o
 #PDFs
 RESUM_OBJS := $(RESUM_OBJS) src/pdf/fit_coefficients.o src/pdf/deriv_pdf.o src/pdf/mellin_pdf.o 
 #ulilities
-RESUM_OBJS := $(RESUM_OBJS) src/utilities/inout.o src/utilities/read_slha.o
+RESUM_OBJS := $(RESUM_OBJS) src/utilities/inout.o
 #hard functions
-RESUM_OBJS := $(RESUM_OBJS) src/qqbar/qq_helamps.o src/qqbar/qq_process.o
+RESUM_OBJS := $(RESUM_OBJS) src/qqbar/qq_helamps.o src/qqbar/qq_process.o src/gg/gg_helamps.o src/gg/gg_process.o
 #resumation
 RESUM_OBJS := $(RESUM_OBJS) src/resum/resum_4top.o 
 
@@ -43,7 +43,7 @@ PDF_program := $(RESUM_OBJS) programs/make_mellin_pdf.o
 
 
 4top_program: $(4top_program)
-	g++ -o ttH $(4top_program) $(CXXFLAGS) $(LDFLAGS) -lgsl -lgslcblas -lm  \
+	g++ -o 4top $(4top_program) $(CXXFLAGS) $(LDFLAGS) -lgsl -lgslcblas -lm  \
 	    -lcuba -lLHAPDF -lgfortran -lboost_program_options
 	    	    
 PDF: $(PDF_program)

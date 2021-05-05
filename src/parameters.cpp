@@ -13,6 +13,7 @@
 #include "LHAPDF/LHAPDF.h"
 #include "fit_coefficients.h"
 #include "qq_process.h"
+#include "gg_process.h"
 
 using namespace std;
 
@@ -89,6 +90,7 @@ std::unordered_map<double, std::vector<std::vector<double>>> fitcoeff;
 
 //process declarations
 qq_process qqhard;
+gg_process gghard;
 // Read param_card and set parameters
 // qqhard.initProc("param_card.dat");
 
@@ -143,5 +145,6 @@ void update_defaults(bool printout , bool pdfset){
 		else{ cout << "Using the real PDFs" << endl; realPDF = true;}
 		cout << "INCEULER (resumming gammaE) = " << INCEULER << endl;
 		cout << "=========================================" << endl;
-	qqhard.initProc("param_card.dat");
+	qqhard.initProc();
+	gghard.initProc();
 }

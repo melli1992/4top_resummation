@@ -10,6 +10,7 @@
 #include <vector>
 #include "LHAPDF/LHAPDF.h"
 #include "qq_process.h"
+#include "gg_process.h"
 
 
 #ifndef PARAM_H 
@@ -75,6 +76,7 @@ extern double ISNLL;
 
 //process
 extern qq_process qqhard;
+extern gg_process gghard;
 
 void update_defaults(bool printout = true , bool pdfset = true);
 
