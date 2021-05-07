@@ -7,6 +7,7 @@
 #include "parameters.h"
 #include "resum_4top.h"
 #include "qq_process.h"
+#include "gg_process.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ complex<double> g2_M2(double A1,double A2,complex<double>lambda){
 	- INCeuler*2.*M_gammaE*log(1.-2.*lambda)*A1/(2.*M_PI*b0);
 }
 
-//expanded version of the wide-angle
+//expanded version of the cusp
 complex<double> delidelj_exp(complex<double> N, double A1){
 	//if(!INCEULER)
 	return alphas_muR*2.*A1/M_PI*log(N)*(log(N)-ISNLL*log(M2/muF2));//+ISNLL*INCEULER*M_gammaE);
@@ -49,34 +50,78 @@ complex<double> qq_res_abs(complex<double> N, vector<double*> mom){
 		else sumqq+=matrix_elements[i]*wide_soft;
 	}
 	complex<double> result = sumqq*cusp_factor;
-	/*if(expansion){
-		 	complex<double> wide_soft2 = 1.-ISNLL*CA*(-1.)*alphas_muR*log(N)/(M_PI);
-			complex<double> exponent = delidelj_exp(N,A1q);
-			//cout << "difference in result qq " << result << " " << (H22qq*S22qq*wide_soft2+H22qq*S22qq*delidelj_exp(N,A1q)) << endl;
-			return result - (H22qq*S22qq*(wide_soft2+exponent));
-	}*/
+	//compute pure correction on top of NLO
+	if(expansion){
+		 	complex<double> wide_soft_exp = ISNLL*CA*alphas_muR*log(N)/(M_PI);
+			complex<double> cusp_expanded = 1.+delidelj_exp(N,A1q);
+			complex<double> sumqq_exp = 0;
+			for(int i=0; i<qqhard.ncol;i++)
+			{
+				if(i < 2) sumqq_exp+=matrix_elements[i]*cusp_expanded;
+				else sumqq_exp+=matrix_elements[i]*(cusp_expanded+wide_soft_exp);
+			}
+			return result - sumqq_exp;
+	}
 	return result;
 }
-/*
-complex<double> gg_res_abs(complex<double> N, double s, double t13, double t14, double t23, double t24)
-{
-	complex<double> lambda = b0*alphas_muR*log(N);
-	complex<double> wide_soft = ISNLL*CA*(-1.)*log(1.-2.*lambda)/(2.*M_PI*b0);
-	complex<double> H22gg = H22_gg_c(s, t13, t14, t23, t24);
-	complex<double> H33gg = H33_gg_c(s, t13, t14, t23, t24);
-	double S11gg = S11_gg();
-	double S22gg = S22_gg();
-	double S33gg = S33_gg();
 
-	complex<double> result = (H22gg*(S22gg*exp(wide_soft)+S11gg/(pow(CA,2)))+ exp(wide_soft)*H33gg*S33gg)
-														*exp(2.*(1./alphas_muR*ISLL*g1_M2(A1g,lambda)+ISNLL*g2_M2(A1g,A2g,lambda)));
+complex<double> gg_res_abs(complex<double> N, vector<double*> mom){
+	complex<double> lambda = b0*alphas_muR*log(N);
+	
+	// Evaluate matrix element
+	gghard.setMomenta(mom);
+	gghard.sigmaKin();
+	const double* matrix_elements = gghard.getMatrixElements();
+	
+	// Do the resummation
+	complex<double> res_factor = -1.*ISNLL*log(1.-2.*lambda)/(2.*M_PI*b0);
+	// written in the diagbasis, not in the orthogonal basis
+	vector<complex<double>> wide_soft = {exp(8.*res_factor),
+											exp(6.*res_factor),
+											exp(6.*res_factor),
+											exp(4.*res_factor),
+											exp(3.*res_factor),
+											exp(3.*res_factor),
+											exp(3.*res_factor),
+											exp(3.*res_factor),
+											exp(3.*res_factor),
+											exp(3.*res_factor),
+											exp(3.*res_factor),
+											exp(3.*res_factor),
+											1.,
+											1.};
+	complex<double> cusp_factor = exp(2.*(1./alphas_muR*ISLL*g1_M2(A1g,lambda)+ISNLL*g2_M2(A1g,A2g,lambda)));
+	complex<double> sumgg = 0;
+	for(int i=0; i<gghard.ncol;i++)
+	{
+		sumgg+=matrix_elements[i]*wide_soft[i];
+	}
+	complex<double> result = sumgg*cusp_factor;
+	//compute pure correction on top of NLO
 	if(expansion){
-		complex<double> wide_soft2 = 1.-ISNLL*CA*(-1.)*alphas_muR*log(N)/(M_PI);
-		//cout << "difference in result gg " << result << " " << ((H22gg*(S22gg*wide_soft2+S11gg/(pow(CA,2)))+ wide_soft2*H33gg*S33gg)
-		//									+ (H22gg*(S22gg+S11gg/(pow(CA,2)))+ H33gg*S33gg)*delidelj_exp(N,A1g)) << endl;
-		complex<double> exponent = delidelj_exp(N,A1g);
-		return result - ((H22gg*(S22gg*(exponent+wide_soft2)+S11gg/(pow(CA,2))*(1.+exponent)))+ (exponent+wide_soft2)*H33gg*S33gg);
-					}
+		 	complex<double> res_factor_exp = ISNLL*alphas_muR*log(N)/(M_PI);
+		 	vector<complex<double>> wide_soft_exp = {8.*res_factor_exp,
+											6.*res_factor_exp,
+											6.*res_factor_exp,
+											4.*res_factor_exp,
+											3.*res_factor_exp,
+											3.*res_factor_exp,
+											3.*res_factor_exp,
+											3.*res_factor_exp,
+											3.*res_factor_exp,
+											3.*res_factor_exp,
+											3.*res_factor_exp,
+											3.*res_factor_exp,
+											0.,
+											0.};
+			complex<double> cusp_expanded = 1.+delidelj_exp(N,A1g);
+			complex<double> sumgg_exp = 0;
+			for(int i=0; i<gghard.ncol;i++)
+			{
+				sumgg_exp+=matrix_elements[i]*(cusp_expanded+wide_soft_exp[i]);
+			}
+			return result - sumgg_exp;
+	}
 	return result;
-}*/
+}
 

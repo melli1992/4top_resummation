@@ -86,7 +86,7 @@ double vegas_4top_res(double *k, size_t dim, void *params){
 	//N for inverse Mellin transform
 	complex<double> N = CMP + k[0]/(1-k[0])*exp(I*phiMP);
 	double result = 0;
-	vector<complex<double>> partonic = xsec_res(N*exp(M_gammaE), rho, s12, s34, k[4], k[5], k[6], k[7], k[8], k[9]);
+	vector<complex<double>> partonic = xsec_res(N*exp(INCEULER*M_gammaE), rho, s12, s34, k[4], k[5], k[6], k[7], k[8], k[9]);
 	result = 2.*Jac*imag(1./(2.*M_PI)*exp(I*phiMP)/pow(1.-k[0], 2.)*
 			              (fit_mellin_pdf_sum_gg(N)*partonic[1] 
 			                + fit_mellin_pdf_sum_qqbar(N)*partonic[0])
@@ -261,8 +261,10 @@ std::vector<complex<double>> xsec_res(complex<double> N, double rho, double s12,
 	double constants = fbunits/512./pow(2*M_PI,8)*flux*s12kal*s34kal*skal*jac_angles;
 	
 	vector<double*> mom = get_momenta(s, s12, s34, thetaCM, phiCM, theta12, phi12, theta34, phi34);
-	complex<double> Mqqbar2 = qq_res_abs(N, mom);
+	complex<double> Mqqbar2 = 0.;
     complex<double> Mgg2 = 0.;
+	if(include_qqbar) Mqqbar2 = qq_res_abs(N+1., mom);
+	if(include_gg) Mgg2 = gg_res_abs(N+1.,mom);
 
 	result[0] = constants*Mqqbar2;
 	result[1] = constants*Mgg2;

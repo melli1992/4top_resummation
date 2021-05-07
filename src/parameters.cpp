@@ -69,8 +69,9 @@ double b1((17.*pow(CA,2)-10.*CA*TF*nF-6.*CF*TF*nF)/(24.*pow(M_PI,2)));
 
 double ISLL(1);
 double ISNLL(1);
-bool fitPDF=true, realPDF=false, LO=true;
+bool fitPDF=true, realPDF=false, LO=true, expansion=false;
 double INCEULER(1.);
+bool include_gg = true, include_qqbar=true;
 
 // anomalous dimensions for dQCD
 double A1q(CF); // 1405.4827 eq. 12
@@ -143,7 +144,11 @@ void update_defaults(bool printout , bool pdfset){
 		}
         if(fitPDF){cout << "Using the fitted PDFs" << endl; realPDF = false;}
 		else{ cout << "Using the real PDFs" << endl; realPDF = true;}
+		cout << "Resummed settings: " << endl;
 		cout << "INCEULER (resumming gammaE) = " << INCEULER << endl;
+		cout << "expansion = " << expansion << endl;
+		cout << "qqbar included = " << include_qqbar << endl;
+		cout << "gg included = " << include_gg << endl;
 		cout << "=========================================" << endl;
 	qqhard.initProc();
 	gghard.initProc();

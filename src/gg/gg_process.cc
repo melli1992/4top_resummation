@@ -24,8 +24,8 @@ void gg_process::initProc()
   pars = Parameters_sm::getInstance();
   pars->setIndependentParameters();
   pars->setIndependentCouplings();
-  pars->printIndependentParameters();
-  pars->printIndependentCouplings();
+  //pars->printIndependentParameters();
+  //pars->printIndependentCouplings();
   // Set external particle masses for this matrix element
   mME.push_back(pars->ZERO);
   mME.push_back(pars->ZERO);
@@ -49,8 +49,8 @@ void gg_process::sigmaKin()
   static bool firsttime = true;
   if (firsttime)
   {
-    pars->printDependentParameters();
-    pars->printDependentCouplings();
+    //pars->printDependentParameters();
+    //pars->printDependentCouplings();
     firsttime = false;
   }
 

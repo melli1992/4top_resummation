@@ -24,8 +24,8 @@ void qq_process::initProc()
   pars = Parameters_sm::getInstance();
   pars->setIndependentParameters();
   pars->setIndependentCouplings();
-  pars->printIndependentParameters();
-  pars->printIndependentCouplings();
+  //pars->printIndependentParameters();
+  //pars->printIndependentCouplings();
   // Set external particle masses for this matrix element
   mME.push_back(pars->ZERO);
   mME.push_back(pars->ZERO);
@@ -46,13 +46,13 @@ void qq_process::sigmaKin()
   // Set the parameters which change event by event
   pars->setDependentParameters();
   pars->setDependentCouplings();
-  /*bool firsttime = true;
+  bool firsttime = true;
   if (firsttime)
   {
-    pars->printDependentParameters();
-    pars->printDependentCouplings();
+    //pars->printDependentParameters();
+    //pars->printDependentCouplings();
     firsttime = false;
-  }*/
+  }
 
   // Reset color flows
   for(int i = 0; i < 6; i++ )

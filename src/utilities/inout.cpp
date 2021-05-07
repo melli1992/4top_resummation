@@ -51,9 +51,6 @@ int configure(int ac, char* av[], string configfile, bool runupdate = true)
         // in config file, but will not be shown to the user.
         po::options_description hidden("Hidden options");
         hidden.add_options()
-            ("input-file", po::value< vector<string> >(), "input file")
-            //output
-            ("output", po::value<string>(&result_map)->default_value("/home/mbeekveld/4top/results"), "output directory")
             //PDFstuf
             ("setname", po::value<string>(&setname)->default_value("PDF4LHC15_nnlo_100"), "Name of PDFset")
             ("usemember", po::value<int>(&use_member)->default_value(0),"member of PDFset to use")
@@ -63,12 +60,15 @@ int configure(int ac, char* av[], string configfile, bool runupdate = true)
             //("observable", po::value<string>(&observable)->default_value("Qinv"),"observable")
             //resummation
             ("inceuler", po::value<double>(&INCEULER)->default_value(1), "resum euler constant in pQCD")
+            ("expansion", po::value<bool>(&expansion)->default_value(false), "expanded result up to NLO")
+            ("qqchan", po::value<bool>(&include_qqbar)->default_value(true), "include qqbar")
+            ("ggchan", po::value<bool>(&include_gg)->default_value(true), "include gg")
             //scales
             ("muR", po::value<double>(&muR)->default_value(500.), "renormalization scale [GeV]")
             ("muF", po::value<double>(&muF)->default_value(500.), "factorization scale [GeV]")
             ("Q", po::value<double>(&Q)->default_value(500.), "hard scale [GeV]")
             //masses
-            ("mt", po::value<double>(&mt)->default_value(173.1), "Top quark mass [GeV]")
+            ("mt", po::value<double>(&mt)->default_value(172.5), "Top quark mass [GeV]")
             //integration
             ("phiMP", po::value<double>(&phiMP)->default_value(3./4.*M_PI), "phiMP for inverse Mellin transform")
             ("CMP", po::value<double>(&CMP)->default_value(2.1), "CMP for inverse Mellin transform")
