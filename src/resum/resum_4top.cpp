@@ -30,8 +30,9 @@ complex<double> g2_M2(double A1,double A2,complex<double>lambda){
 
 //expanded version of the cusp
 complex<double> delidelj_exp(complex<double> N, double A1){
-	//if(!INCEULER)
-	return alphas_muR*2.*A1/M_PI*log(N)*(log(N)-ISNLL*log(M2/muF2));//+ISNLL*INCEULER*M_gammaE);
+	double INCeuler = 0.;
+	if(INCEULER == 0) {INCeuler = 1.;}
+	return alphas_muR*2.*A1/M_PI*log(N)*(log(N)+2.*INCeuler*M_gammaE-ISNLL*log(M2/muF2));
 }
 
 complex<double> qq_res_abs(complex<double> N, vector<double*> mom){
@@ -57,10 +58,10 @@ complex<double> qq_res_abs(complex<double> N, vector<double*> mom){
 			complex<double> sumqq_exp = 0;
 			for(int i=0; i<qqhard.ncol;i++)
 			{
-				if(i < 2) sumqq_exp+=matrix_elements[i]*cusp_expanded;
-				else sumqq_exp+=matrix_elements[i]*(cusp_expanded+wide_soft_exp);
+				if(i < 2) sumqq_exp+=matrix_elements[i]*(cusp_factor-cusp_expanded);
+				else sumqq_exp+=matrix_elements[i]*(cusp_factor*wide_soft-cusp_expanded-wide_soft_exp);
 			}
-			return result - sumqq_exp;
+			return sumqq_exp;
 	}
 	return result;
 }

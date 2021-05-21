@@ -63,36 +63,53 @@ int main(int argc, char* argv[]){
 	/// creating the output file
 	//////////////////////////////////////////////
 	ofstream output;
-	string homedir = "4top_07052021";
-	string q_str = "results/"+homedir+"/output_4top_res_";
+	string homedir = "4top_20052021";
+	string q_str = "results/"+homedir+"/output_4top_resum_exact_HR_ortho_";
 	if((include_gg == true) and (include_qqbar==false))  q_str += "gg_";
 	if((include_gg == false) and (include_qqbar==true))  q_str += "qq_";
 	if(expansion) q_str += "expanded_";
+	if(fitPDF) q_str+= "fitpdf_";
+	if(!fitPDF) q_str+= "realpdf_";
 	q_str += "CMP_"+to_string_round(CMP)+"_phiMP_"+to_string_round(phiMP);
 	output.open(q_str.c_str()); 
 	//////////////////////////////////////////////
 	/// code for total xsec
 	//////////////////////////////////////////////
-	cout << "CMP = " << CMP << " phiMP = " << phiMP << endl;
-	output << "CMP = " << CMP << " phiMP = " << phiMP << endl;
+	//cout << "CMP = " << CMP << " phiMP = " << phiMP << endl;
+	//output << "CMP = " << CMP << " phiMP = " << phiMP << endl;
 	
-	vector<double> top_quark_values = {100,125,150,175,200,225,250,275,300,350,400,450,500,550,600,650,700,750};
-	for(int k = 0; k < 18; k++){
-		mt = top_quark_values[k];
+	//vector<double> top_quark_values = {100,125,150,172.5, 173, 175,200,225,250,275,300,350,400,450,500,550,625,750};
+	//for(int k = 0; k < 19; k++){
+	
+	    mt = 172.5;
 		mt2 = pow(mt,2);
 		Q2 = pow(4.*mt,2); Q = sqrt(Q2);
-		muF = 4.*mt;
-		muR = 4.*mt;
 		tau = Q2/S2;
-		muF = closest(muF_values_pdf, muF);
-		muR = closest(muF_values_pdf, muR);
-		update_defaults();
-		output << "mt = " << mt << ", muF = " << muF << ", muR = " << muR << endl;
-		output << " qqbar_included = " << include_qqbar << " gg_included = " << include_gg << " expanded = " << expansion << endl;
-		out_result = call_vegas(init_vegas_4top("resum"),params, true, true);
-		cout << "Res: " << out_result.res << " " << out_result.err << endl;
-		output << "Res: " << out_result.res << " " << out_result.err << endl;
-	}
+		vector<double> scales = {mt, 2.*mt, 4.*mt};
+		vector<double> CMPval = {2.1, 2.3};
+		vector<double> phival = {2./3.*M_PI};
+		for(int k = 0; k < 1; k++){
+			phiMP = phival[k];
+			for(int j = 0; j < 2; j++){
+				CMP = CMPval[j];
+					for(int scal = 0; scal < 3; scal++){
+					muF = scales[scal];
+					muR = scales[scal];
+					if(fitPDF){
+						muF = closest(muF_values_pdf, muF);
+						muR = closest(muF_values_pdf, muR);
+					}
+					update_defaults();
+					output << "CMP = " << CMP << " phiMP = " << phiMP << endl;
+					output << "mt = " << mt << ", muF = " << muF << ", muR = " << muR << endl;
+					output << " qqbar_included = " << include_qqbar << " gg_included = " << include_gg << " expanded = " << expansion << endl;
+					//out_result = call_vegas(init_vegas_4top("resum"),params, true, true);
+					out_result = call_vegas(init_vegas_4top("resum"),params, true, true);
+					cout << "Res: " << out_result.res << " " << out_result.err << endl;
+					output << "Res: " << out_result.res << " " << out_result.err << endl;
+					}
+				}
+			}
 		
 	output.close();
 	return 0;

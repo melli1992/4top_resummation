@@ -228,16 +228,20 @@ std::vector<double> xsec_LO(double rho, double s12, double s34, double thetaCM, 
 	vector<double*> mom = get_momenta(s, s12, s34, thetaCM, phiCM, theta12, phi12, theta34, phi34);
 	
 	// Evaluate matrix element qqbar
-	qqhard.setMomenta(mom);
-	qqhard.sigmaKin();
-	const double* matrix_elements_qq = qqhard.getMatrixElements();
-	for(int i=0; i<qqhard.ncol;i++) Mqqbar2+=matrix_elements_qq[i];
+	if(include_qqbar){
+		qqhard.setMomenta(mom);
+		qqhard.sigmaKin();
+		const double* matrix_elements_qq = qqhard.getMatrixElements();
+		for(int i=0; i<qqhard.ncol;i++) Mqqbar2+=matrix_elements_qq[i];
+	}
 	
 	// Evaluate matrix element gg
-	gghard.setMomenta(mom);
-	gghard.sigmaKin();
-	const double* matrix_elements_gg = gghard.getMatrixElements();
-	for(int i=0; i<gghard.ncol;i++) Mgg2+=matrix_elements_gg[i];
+	if(include_gg){
+		gghard.setMomenta(mom);
+		gghard.sigmaKin();
+		const double* matrix_elements_gg = gghard.getMatrixElements();
+		for(int i=0; i<gghard.ncol;i++) Mgg2+=matrix_elements_gg[i];
+	}
 
 	result[0] = constants*Mqqbar2;
 	result[1] = constants*Mgg2;

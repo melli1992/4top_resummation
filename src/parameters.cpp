@@ -118,8 +118,8 @@ void update_defaults(bool printout , bool pdfset){
 	}
 	
 		
-	realPDF = false;
-	fitPDF = true;
+	//realPDF = false;
+	//fitPDF = true;
 	if(fitPDF){
     cout << "Using fitted PDFs" << endl;
 		if (setname=="PDF4LHC15_nnlo_100"){fitcoeff = fitcoeff_PDF4LHC15_nnlo_100;}
@@ -149,6 +149,7 @@ void update_defaults(bool printout , bool pdfset){
 		cout << "expansion = " << expansion << endl;
 		cout << "qqbar included = " << include_qqbar << endl;
 		cout << "gg included = " << include_gg << endl;
+	    cout << "CMP = " << CMP << " phiMP = " << phiMP << endl;
 		cout << "=========================================" << endl;
 	qqhard.initProc();
 	gghard.initProc();
