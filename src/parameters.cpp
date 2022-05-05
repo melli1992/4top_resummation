@@ -66,12 +66,12 @@ double b0((11*CA/3.-2*nF/3.)/(4.*M_PI));
 double b1((17.*pow(CA,2)-10.*CA*TF*nF-6.*CF*TF*nF)/(24.*pow(M_PI,2)));
 
 //switches
-
 double ISLL(1);
 double ISNLL(1);
 bool fitPDF=true, realPDF=false, LO=true, expansion=false;
 double INCEULER(1.);
 bool include_gg = true, include_qqbar=true;
+bool include_C1 = true, include_S1 = true;
 
 // anomalous dimensions for dQCD
 double A1q(CF); // 1405.4827 eq. 12
@@ -81,6 +81,9 @@ double A2g(CA/2.*(CA*(67./18.-pow(M_PI,2)/6.)-10./9.*TF*nF));// 1405.4827 eq. 12
 
 double B1q(-3./4*CF);
 double B1g(-M_PI*b0);
+
+double gamma_q(3./2.*CF);
+double gamma_g(11./6.*CA - 2./3.*nF*TF);
 
 //PDF declarations
 string setname("PDF4LHC15_nnlo_100");
@@ -92,6 +95,7 @@ std::unordered_map<double, std::vector<std::vector<double>>> fitcoeff;
 //process declarations
 qq_process qqhard;
 gg_process gghard;
+std::string method;
 // Read param_card and set parameters
 // qqhard.initProc("param_card.dat");
 

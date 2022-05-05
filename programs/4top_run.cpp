@@ -5,13 +5,13 @@
 #include "monte_carlo.h"
 #include "mellin_pdf.h"
 #include "parameters.h"
-#include "qq_process.h"
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_monte.h>
 #include <gsl/gsl_monte_vegas.h>
 #include <string.h>
 #include <sstream>
 #include "inout.h"
+#include "4top_vegas.h"
 using namespace std;
 
 
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]){
 	lumni_params params = {z, Q, 2*Q/S, 0, 0, 0,0,0};
     
     muF = 235.;
-	muR = 235.;
+	//muR = 235.;
 	mt  = 172.5;
 	mt2 = mt*mt;
 	update_defaults();
@@ -62,16 +62,22 @@ int main(int argc, char* argv[]){
 	//////////////////////////////////////////////
 	/// creating the output file
 	//////////////////////////////////////////////
+	
 	ofstream output;
-	string homedir = "4top_20052021";
-	string q_str = "results/"+homedir+"/output_4top_resum_exact_HR_ortho_";
+	string homedir = "4top_05052022";
+	string q_str = "results/"+homedir+"/output_4top_"+method+"_";
 	if((include_gg == true) and (include_qqbar==false))  q_str += "gg_";
 	if((include_gg == false) and (include_qqbar==true))  q_str += "qq_";
 	if(expansion) q_str += "expanded_";
+	if(INCEULER) q_str += "nbaryes_";
+	else q_str += "nbarno_";
+	if(include_S1) q_str += "S1yes_";
+	if(include_C1) q_str += "C1yes_";
 	if(fitPDF) q_str+= "fitpdf_";
 	if(!fitPDF) q_str+= "realpdf_";
-	q_str += "CMP_"+to_string_round(CMP)+"_phiMP_"+to_string_round(phiMP);
+	q_str += "CMP_"+to_string_round(CMP)+"_phiMP_"+to_string_round(phiMP)+"_muR_"+to_string_round(muR);
 	output.open(q_str.c_str()); 
+	cout << "Opening the file " << q_str << endl;
 	//////////////////////////////////////////////
 	/// code for total xsec
 	//////////////////////////////////////////////
@@ -80,36 +86,53 @@ int main(int argc, char* argv[]){
 	
 	//vector<double> top_quark_values = {100,125,150,172.5, 173, 175,200,225,250,275,300,350,400,450,500,550,625,750};
 	//for(int k = 0; k < 19; k++){
-	
-	    mt = 172.5;
+		mt = 172.5;
 		mt2 = pow(mt,2);
 		Q2 = pow(4.*mt,2); Q = sqrt(Q2);
 		tau = Q2/S2;
-		vector<double> scales = {mt, 2.*mt, 4.*mt};
-		vector<double> CMPval = {2.1, 2.3};
-		vector<double> phival = {2./3.*M_PI};
-		for(int k = 0; k < 1; k++){
-			phiMP = phival[k];
-			for(int j = 0; j < 2; j++){
-				CMP = CMPval[j];
-					for(int scal = 0; scal < 3; scal++){
-					muF = scales[scal];
-					muR = scales[scal];
+		//vector<double> scales = {muR};
+		vector<double> scales = {mt, 2*mt, 4*mt};
+		/*muF = scales[0];
+		muR = scales[0];
+		if(fitPDF){
+			muF = closest(muF_values_pdf, muF);
+			muR = closest(muF_values_pdf, muR);
+		}*/
+		update_defaults();                   
+		// double s = 8134873.7525206236 ;
+		// double s12 = 823711.00265290437 ;
+		// double s34 = 495636.87293792958;
+		// double thetaCM = 1.9619335642393936;
+		// double phiCM = 0.0;
+		// double theta12 = 2.4125718167750776;
+		// double phi12 = 2.1718290474314728 ;
+		// double theta34 = 0.69835376399455884 ;
+		// double phi34 = 1.1490681137878767;
+		// complex<double> N = 1.8682287539440572+I*0.23177121566281500;
+		
+		// test_res(s, s12, s34, thetaCM, theta12, theta34, phiCM, phi12, phi34, N);
+		// exit(0);
+	//	vector<double> CMPval = {1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5};
+	//	vector<double> phival = {2./3.*M_PI, 0.70833333333*M_PI, 3./4.*M_PI};
+	//	for(int k = 0; k < 3; k++){
+	//		phiMP = phival[k];
+	//		for(int j = 0; j < 11; j++){
+	//			if((method == "LO") && (k > 0 || j > 0)) continue;
+	//			CMP = CMPval[j];
+	
+					for(int scalF = 0; scalF < 3; scalF++){
+					muF = scales[scalF];
+					//muR = scales[scal];
 					if(fitPDF){
 						muF = closest(muF_values_pdf, muF);
-						muR = closest(muF_values_pdf, muR);
+						//muR = closest(muF_values_pdf, muR);
 					}
 					update_defaults();
-					output << "CMP = " << CMP << " phiMP = " << phiMP << endl;
-					output << "mt = " << mt << ", muF = " << muF << ", muR = " << muR << endl;
-					output << " qqbar_included = " << include_qqbar << " gg_included = " << include_gg << " expanded = " << expansion << endl;
-					//out_result = call_vegas(init_vegas_4top("resum"),params, true, true);
-					out_result = call_vegas(init_vegas_4top("resum"),params, true, true);
+					out_result = call_vegas(init_vegas_4top(method),params, true, true);
 					cout << "Res: " << out_result.res << " " << out_result.err << endl;
-					output << "Res: " << out_result.res << " " << out_result.err << endl;
+					output << "CMP = " << CMP << " phiMP = " << phiMP << " mt = " << mt << ", muF = " << muF << ", muR = " << muR << " qqbar_included = " << include_qqbar << " gg_included = " << include_gg << " expanded = " << expansion << " includeS1 = " << include_S1 << " includeC1 = " << include_C1 << " Res = " << out_result.res << " " << out_result.err << endl;
 					}
-				}
-			}
+				
 		
 	output.close();
 	return 0;

@@ -25,8 +25,6 @@ int configure(int ac, char* av[], string configfile, bool runupdate = true)
 {
     try {
 
-        int order; //order for LO, NLO etc.
-        string resum_order; // LL, NLL, NNLL
         double comTeV; // sqrt(S) in TeV
         string config_file = configfile;
 		// Declare a group of options that will be
@@ -55,12 +53,15 @@ int configure(int ac, char* av[], string configfile, bool runupdate = true)
             ("setname", po::value<string>(&setname)->default_value("PDF4LHC15_nnlo_100"), "Name of PDFset")
             ("usemember", po::value<int>(&use_member)->default_value(0),"member of PDFset to use")
             ("fitPDF", po::value<bool>(&fitPDF)->default_value(false),"use own fits to PDF grid")
+            ("method", po::value<string>(&method)->default_value("res"), "method of integration")
             //process
             ("sqrtS", po::value<double>(&comTeV)->default_value(13.), "center-of-mass energy [TeV]")
             //("observable", po::value<string>(&observable)->default_value("Qinv"),"observable")
             //resummation
             ("inceuler", po::value<double>(&INCEULER)->default_value(1), "resum euler constant in pQCD")
             ("expansion", po::value<bool>(&expansion)->default_value(false), "expanded result up to NLO")
+            ("includeS1", po::value<bool>(&include_S1)->default_value(false), "include S1")
+            ("includeC1", po::value<bool>(&include_C1)->default_value(false), "include C1")
             ("qqchan", po::value<bool>(&include_qqbar)->default_value(true), "include qqbar")
             ("ggchan", po::value<bool>(&include_gg)->default_value(true), "include gg")
             //scales
@@ -84,7 +85,7 @@ int configure(int ac, char* av[], string configfile, bool runupdate = true)
         po::options_description visible("Allowed options");
         visible.add(generic).add(config);
 
-        po::positional_options_description p;
+                po::positional_options_description p;
         p.add("input-file", -1);
 
         po::variables_map vm;
@@ -124,3 +125,4 @@ int configure(int ac, char* av[], string configfile, bool runupdate = true)
     }
     return 0;
 }
+     

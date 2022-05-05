@@ -50,6 +50,21 @@ functionint init_vegas_4top(std::string process){
 			//order is N x1, x2, rho s12 s34 thetaCM theta12 theta34 phi12 phi34
 		//	}
 		}
+	else if(process == "LO_1st"){
+		integrand.G.f =&vegas_4top_LO_1st;
+		integrand.G.dim = 12;
+		integrand.xl = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.};
+		integrand.xu = {1.,1.,1.,1.,M_PI, M_PI,M_PI, 2.*M_PI, 2.*M_PI, 2.*M_PI,1.,1.};
+		//order is N rho s12 s34 thetaCM theta12 theta34 phiCM phi12 phi34 x1 x2
+	}
+	
+	else if(process == "LO_2nd"){
+		integrand.G.f =&vegas_4top_LO_2nd;
+		integrand.G.dim = 12;
+		integrand.xl = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.};
+		integrand.xu = {1.,1.,1.,1.,M_PI, M_PI,M_PI, 2.*M_PI, 2.*M_PI, 2.*M_PI,1.,1.};
+		//order is N rho s12 s34 thetaCM theta12 theta34 phiCM phi12 phi34 x1 x2
+	}
 	else if(process == "resum"){
 		integrand.G.f =&vegas_4top_res;
 		if(fitPDF){
@@ -60,6 +75,22 @@ functionint init_vegas_4top(std::string process){
 		}
 		else{cout << "This option for integration does not exist" << endl;
 			 exit(0);}
+		}
+	
+	else if(process == "resum_1st"){
+		integrand.G.f =&vegas_4top_res_1st;
+		integrand.G.dim = 12;
+			integrand.xl = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.};
+			integrand.xu = {1.,1.,1.,1.,M_PI, M_PI,M_PI, 2.*M_PI, 2.*M_PI, 2.*M_PI,1.,1.};
+			//order is N rho s12 s34 thetaCM theta12 theta34 phiCM phi12 phi34 x1 x2
+		}
+	
+	else if(process == "resum_2nd"){
+		integrand.G.f =&vegas_4top_res_2nd;
+		integrand.G.dim = 12;
+			integrand.xl = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.};
+			integrand.xu = {1.,1.,1.,1.,M_PI, M_PI,M_PI, 2.*M_PI, 2.*M_PI, 2.*M_PI,1.,1.};
+			//order is N rho s12 s34 thetaCM theta12 theta34 phiCM phi12 phi34 x1 x2
 		}
 	else{cout << "this option does not exist" << endl;
 			exit(0);}
@@ -86,7 +117,7 @@ results call_vegas(functionint integrand, lumni_params params, bool verbal, bool
 
 
 	  integrand.G.params = &params;
-	  size_t calls = 100000;
+	  size_t calls = 150000;
 
 	  gsl_monte_vegas_state *s = gsl_monte_vegas_alloc (integrand.G.dim);
 	  gsl_monte_vegas_init(s); //whatever, just do it
@@ -95,7 +126,7 @@ results call_vegas(functionint integrand, lumni_params params, bool verbal, bool
 	  //params_run->alpha = 2.0;
 	  gsl_monte_vegas_params_set(s, params_run);
 
-		gsl_monte_vegas_integrate (&integrand.G, &integrand.xl[0], &integrand.xu[0], integrand.G.dim,  10000, r, s, &res, &err); //integrate g over dim-dim region defined by lower and upper limits in arrays xl and xu, each of size dim. r is the random number generator. The result is given to res and err. This function is to prepare/warm up the grid (1000 function calls). After this the main run is called with calls/5 function calls.
+		gsl_monte_vegas_integrate (&integrand.G, &integrand.xl[0], &integrand.xu[0], integrand.G.dim,  15000, r, s, &res, &err); //integrate g over dim-dim region defined by lower and upper limits in arrays xl and xu, each of size dim. r is the random number generator. The result is given to res and err. This function is to prepare/warm up the grid (1000 function calls). After this the main run is called with calls/5 function calls.
 		display_results("Initialization - " ,res, err);
 
 	  int n_iter = 0, k = 0;

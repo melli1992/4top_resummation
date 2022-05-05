@@ -61,6 +61,9 @@ extern double A1g;
 extern double A2q;
 extern double A2g;
 
+extern double gamma_q;
+extern double gamma_g;
+
 //PDF parameters
 extern std::string setname;
 extern std::vector<LHAPDF::PDF*> pdfs; //pdf vector
@@ -75,6 +78,9 @@ extern double ISLL;
 extern double ISNLL;
 extern bool include_gg;
 extern bool include_qqbar;
+extern bool include_C1;
+extern bool include_S1;
+extern std::string method;
 
 //process
 extern qq_process qqhard;
