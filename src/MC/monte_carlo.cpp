@@ -117,7 +117,7 @@ results call_vegas(functionint integrand, lumni_params params, bool verbal, bool
 
 
 	  integrand.G.params = &params;
-	  size_t calls = 150000;
+	  size_t calls = 200000;
 
 	  gsl_monte_vegas_state *s = gsl_monte_vegas_alloc (integrand.G.dim);
 	  gsl_monte_vegas_init(s); //whatever, just do it
@@ -126,7 +126,7 @@ results call_vegas(functionint integrand, lumni_params params, bool verbal, bool
 	  //params_run->alpha = 2.0;
 	  gsl_monte_vegas_params_set(s, params_run);
 
-		gsl_monte_vegas_integrate (&integrand.G, &integrand.xl[0], &integrand.xu[0], integrand.G.dim,  15000, r, s, &res, &err); //integrate g over dim-dim region defined by lower and upper limits in arrays xl and xu, each of size dim. r is the random number generator. The result is given to res and err. This function is to prepare/warm up the grid (1000 function calls). After this the main run is called with calls/5 function calls.
+		gsl_monte_vegas_integrate (&integrand.G, &integrand.xl[0], &integrand.xu[0], integrand.G.dim,  20000, r, s, &res, &err); //integrate g over dim-dim region defined by lower and upper limits in arrays xl and xu, each of size dim. r is the random number generator. The result is given to res and err. This function is to prepare/warm up the grid (1000 function calls). After this the main run is called with calls/5 function calls.
 		display_results("Initialization - " ,res, err);
 
 	  int n_iter = 0, k = 0;
@@ -148,7 +148,7 @@ results call_vegas(functionint integrand, lumni_params params, bool verbal, bool
 		if(k>3){break;}
 
        }
-       while (((isnan(res))||(fabs (chisq - 1.0) > 0.1)||(fabs (err/res) > minerr)));
+       while (((isnan(res))||(fabs (chisq - 1.0) > 0.2)||(fabs (err/res) > minerr)));
       display_results("Final result - ", res, err, chisq);
 
 

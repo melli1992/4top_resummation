@@ -68,10 +68,12 @@ double b1((17.*pow(CA,2)-10.*CA*TF*nF-6.*CF*TF*nF)/(24.*pow(M_PI,2)));
 //switches
 double ISLL(1);
 double ISNLL(1);
-bool fitPDF=true, realPDF=false, LO=true, expansion=false;
+bool fitPDF=true, realPDF=false, LO=true, expansion=false, NLL_truncated = false;
+double cusp_piece_LO(1.), cusp_piece_NLO(1.), cusp_piece(1.), wide_soft_piece(1.), s1_piece(1.), c1_piece(1.), b0_piece(1.);
 double INCEULER(1.);
 bool include_gg = true, include_qqbar=true;
 bool include_C1 = true, include_S1 = true;
+double ONLY_SF(0);
 
 // anomalous dimensions for dQCD
 double A1q(CF); // 1405.4827 eq. 12

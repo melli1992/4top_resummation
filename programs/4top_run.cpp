@@ -51,8 +51,8 @@ int main(int argc, char* argv[]){
     
     muF = 235.;
 	//muR = 235.;
-	mt  = 172.5;
-	mt2 = mt*mt;
+	//mt  = 172.5;
+	//mt2 = mt*mt;
 	update_defaults();
 	vector<double> muF_values_pdf;
 	for (std::unordered_map<double, std::vector<std::vector<double>>>::iterator it=fitcoeff.begin(); it!=fitcoeff.end(); ++it)
@@ -62,9 +62,12 @@ int main(int argc, char* argv[]){
 	//////////////////////////////////////////////
 	/// creating the output file
 	//////////////////////////////////////////////
-	
+	//ISLL  = 1, ISNLL = 0, include_S1 = false, include_C1 = false;
+	//string homedir = "4top_26052022";
 	ofstream output;
-	string homedir = "4top_05052022";
+	//include_S1 = false; include_C1 = false;
+	string homedir = "4top_mass_differences";//"4top_additional_scale_piece_13TeV"; //"4top_17062022";
+	//string q_str = "results/"+homedir+"/output_4top_"+method+"_LL_";
 	string q_str = "results/"+homedir+"/output_4top_"+method+"_";
 	if((include_gg == true) and (include_qqbar==false))  q_str += "gg_";
 	if((include_gg == false) and (include_qqbar==true))  q_str += "qq_";
@@ -75,7 +78,8 @@ int main(int argc, char* argv[]){
 	if(include_C1) q_str += "C1yes_";
 	if(fitPDF) q_str+= "fitpdf_";
 	if(!fitPDF) q_str+= "realpdf_";
-	q_str += "CMP_"+to_string_round(CMP)+"_phiMP_"+to_string_round(phiMP)+"_muR_"+to_string_round(muR);
+	if(ONLY_SF==0) q_str+= "ONLY_SF_";
+	q_str += "CMP_"+to_string_round(CMP)+"_phiMP_"+to_string_round(phiMP)+"_muR_"+to_string_round(muR)+"_mt_"+to_string_round(mt);
 	output.open(q_str.c_str()); 
 	cout << "Opening the file " << q_str << endl;
 	//////////////////////////////////////////////
@@ -86,7 +90,6 @@ int main(int argc, char* argv[]){
 	
 	//vector<double> top_quark_values = {100,125,150,172.5, 173, 175,200,225,250,275,300,350,400,450,500,550,625,750};
 	//for(int k = 0; k < 19; k++){
-		mt = 172.5;
 		mt2 = pow(mt,2);
 		Q2 = pow(4.*mt,2); Q = sqrt(Q2);
 		tau = Q2/S2;
@@ -98,19 +101,21 @@ int main(int argc, char* argv[]){
 			muF = closest(muF_values_pdf, muF);
 			muR = closest(muF_values_pdf, muR);
 		}*/
-		update_defaults();                   
-		// double s = 8134873.7525206236 ;
-		// double s12 = 823711.00265290437 ;
-		// double s34 = 495636.87293792958;
-		// double thetaCM = 1.9619335642393936;
-		// double phiCM = 0.0;
-		// double theta12 = 2.4125718167750776;
-		// double phi12 = 2.1718290474314728 ;
-		// double theta34 = 0.69835376399455884 ;
-		// double phi34 = 1.1490681137878767;
-		// complex<double> N = 1.8682287539440572+I*0.23177121566281500;
 		
-		// test_res(s, s12, s34, thetaCM, theta12, theta34, phiCM, phi12, phi34, N);
+		update_defaults();
+		/*                 
+		double s = 8134873.7525206236 ;
+		double s12 = 823711.00265290437 ;
+		double s34 = 495636.87293792958;
+		double thetaCM = 1.9619335642393936;
+		double phiCM = 0.0;
+		double theta12 = 2.4125718167750776;
+		double phi12 = 2.1718290474314728 ;
+		double theta34 = 0.69835376399455884 ;
+		double phi34 = 1.1490681137878767;
+		complex<double> N = 1.7682287539440571+I*0.23177121566281500;
+		
+		test_res(s, s12, s34, thetaCM, theta12, theta34, phiCM, phi12, phi34, N);*/
 		// exit(0);
 	//	vector<double> CMPval = {1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5};
 	//	vector<double> phival = {2./3.*M_PI, 0.70833333333*M_PI, 3./4.*M_PI};
@@ -126,6 +131,9 @@ int main(int argc, char* argv[]){
 					if(fitPDF){
 						muF = closest(muF_values_pdf, muF);
 						//muR = closest(muF_values_pdf, muR);
+					}
+					if(muR == muF){
+						continue;
 					}
 					update_defaults();
 					out_result = call_vegas(init_vegas_4top(method),params, true, true);

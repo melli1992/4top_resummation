@@ -72,10 +72,12 @@ extern int use_member; //the member that one needs to use
 struct lumni_params {double z; double pT; double xT; double epeta; double emeta; int power; int flavor; int coefficient;};
 
 //settings
-extern bool realPDF, fitPDF, LO, expansion;
+extern bool realPDF, fitPDF, LO, expansion, NLL_truncated;
 extern double INCEULER;
 extern double ISLL;
 extern double ISNLL;
+extern double ONLY_SF;
+extern double cusp_piece_LO, cusp_piece_NLO, cusp_piece, wide_soft_piece, s1_piece, c1_piece, b0_piece;
 extern bool include_gg;
 extern bool include_qqbar;
 extern bool include_C1;

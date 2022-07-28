@@ -43,9 +43,17 @@ double C1_coefficient(double Ci, double gammai){
 	double INCeuler = 0.;
 	if(INCEULER == 0) {INCeuler = 1.;}
 	return alphas_muR*2*Ci/M_PI*(1./2.*zeta2 + 1./4.*pow(log(muR2/Q2),2) + 
-					(1./2.*gammai-INCeuler*M_gammaE)*log(muR2/muF2) +
+					(1./2.*gammai/Ci-INCeuler*M_gammaE)*log(muR2/muF2) +
 					INCeuler*M_gammaE*log(muR2/Q2) + pow(INCeuler*M_gammaE, 2)
 					);
+}
+
+// scale coefficient
+// needs to be multiplied with H0
+double scale_coefficient(double Ci, double gammai){
+	// double INCeuler = 0.;
+	// if(INCEULER == 0) {INCeuler = 1.;}
+	return -4.*b0*alphas_muR*log(muF2/muR2); // - alphas_muR*2*Ci/M_PI*((1./2.*gammai/Ci-INCeuler*M_gammaE)*log(muR2/muF2));
 }
 
 complex<double> qq_res_abs(complex<double> N, vector<double*> mom){
@@ -63,34 +71,38 @@ complex<double> qq_res_abs(complex<double> N, vector<double*> mom){
 	complex<double> wide_soft = exp(ISNLL*-1.*CA*log(1.-2.*lambda)/(2.*M_PI*b0));
 	complex<double> cusp_factor = exp(2.*(1./alphas_muR*ISLL*g1_M2(A1q,lambda)+ISNLL*g2_M2(A1q,A2q,lambda)));
 	complex<double> sumqq = 0;
-	double C1 = 0;
+	double C1 = 0, SF = 0;
 	int size_qqhard = qqhard.ncol;
 	vector<double> S1(size_qqhard, 0.0);
 	if(include_C1){
-		C1 = C1_coefficient(CF, gamma_q);
+		C1 = ISNLL*C1_coefficient(CF, gamma_q)*ONLY_SF;
+		SF = ISNLL*scale_coefficient(CF, gamma_q);
 	}
 	// handle the colour part
 	for(int i=0; i<size_qqhard;i++)
 	{
 		if(include_S1){
 			if(i < 2) S1[i] = 0;
-			else      S1[i] = alphas_muR/M_PI*CA*(1 + INCeuler*M_gammaE + 1./2.*log(muR2/Q2));
+			else      S1[i] = ISNLL*alphas_muR/M_PI*CA*(1 + INCeuler*M_gammaE + 1./2.*log(muR2/Q2));
 		}
-		if(i < 2) sumqq+=matrix_elements[i];
-		else sumqq+=matrix_elements[i]*(1+S1[i]+C1)*wide_soft;
+		if(i < 2) sumqq+=matrix_elements[i]*((1.+C1)*ONLY_SF+SF);
+		else sumqq+=matrix_elements[i]*((1+S1[i]+C1)*ONLY_SF+SF)*wide_soft;
 	}
 	complex<double> result = sumqq*cusp_factor;
 	//compute pure correction on top of NLO
 	if(expansion){
 		 	complex<double> wide_soft_exp = ISNLL*CA*alphas_muR*log(N)/(M_PI);
-			complex<double> cusp_expanded = 1.+delidelj_exp(N,A1q);
+			complex<double> cusp_expanded = 1.*cusp_piece_LO+delidelj_exp(N,A1q)*cusp_piece_NLO;
 			complex<double> sumqq_exp = 0;
 			for(int i=0; i<size_qqhard;i++)
 			{
-				if(i < 2) sumqq_exp+=matrix_elements[i]*((1.+C1)*cusp_factor-cusp_expanded-C1);
-				else sumqq_exp+=matrix_elements[i]*((1.+S1[i]+C1)*cusp_factor*wide_soft-cusp_expanded-wide_soft_exp-C1-S1[i]);
+				//if(i < 2) sumqq_exp+=matrix_elements[i]*(((1.+C1)*ONLY_SF+SF)*cusp_factor-cusp_expanded*ONLY_SF-C1*ONLY_SF-SF);
+				//else      sumqq_exp+=matrix_elements[i]*(((1.+S1[i]+C1)*ONLY_SF+SF)*cusp_factor*wide_soft-cusp_expanded*ONLY_SF-wide_soft_exp*ONLY_SF-C1*ONLY_SF-S1[i]*ONLY_SF-SF);
+				if(i < 2) sumqq_exp+=matrix_elements[i]*(cusp_expanded*ONLY_SF+C1*ONLY_SF*c1_piece+SF*b0_piece);
+				else      sumqq_exp+=matrix_elements[i]*(cusp_expanded*ONLY_SF+wide_soft_exp*ONLY_SF*wide_soft_piece+C1*ONLY_SF*c1_piece+S1[i]*ONLY_SF*s1_piece+SF*b0_piece);
 			}
-			return sumqq_exp;
+			if (NLL_truncated) return sumqq_exp;
+			return result - sumqq_exp;
 	}
 	return result;
 }
@@ -98,7 +110,7 @@ complex<double> qq_res_abs(complex<double> N, vector<double*> mom){
 complex<double> gg_res_abs(complex<double> N, vector<double*> mom){
 
 	double INCeuler = 0.;
-	if(INCEULER == 0) {INCeuler = 1.;}
+	if(INCEULER == false) {INCeuler = 1.;}
 	complex<double> lambda = b0*alphas_muR*log(N);
 	
 	// Evaluate matrix element
@@ -128,16 +140,17 @@ complex<double> gg_res_abs(complex<double> N, vector<double*> mom){
 	complex<double> sumgg = 0;
 
 	// hard collinear correction
-	double C1 = 0;
+	double C1 = 0, SF = 0;
 	int size_gghard = gghard.ncol;
 	if(include_C1){
-		C1 = C1_coefficient(CA, gamma_g);
+		C1 = ISNLL*C1_coefficient(CA, gamma_g)*ONLY_SF;
+		SF = ISNLL*scale_coefficient(CA, gamma_g);
 	}
 
 	// soft correction
 	vector<double> S1(size_gghard, 0.0);
 	if(include_S1){
-		double mult_factor_s1 = alphas_muR/(M_PI)*(1 + INCeuler*M_gammaE + 1./2.*log(muR2/Q2));
+		double mult_factor_s1 = ISNLL*alphas_muR/(M_PI)*(1 + INCeuler*M_gammaE + 1./2.*log(muR2/Q2));
 		S1 = {8.*mult_factor_s1,
 				6*mult_factor_s1,
 				6*mult_factor_s1,
@@ -157,10 +170,11 @@ complex<double> gg_res_abs(complex<double> N, vector<double*> mom){
 	
 	// handle the colour part
 	//cout << "C1=" << C1 << " C1/(alphas/pi) " << C1/(alphas_muR/M_PI) << endl;
+	//cout << "INCeuler*M_gammaE=" << INCeuler*M_gammaE << " log(muR2/Q2) " << log(muR2/Q2) << endl;
 	for(int i=0; i<size_gghard;i++)
 	{	
-		//cout << "matrix_elements[" << i << "]=" << matrix_elements[i] << " wide_soft[" << i << "]" << wide_soft[i] << "S1 " << S1[i] << "S1/(alphas_muR/pi) " << S1[i]/(alphas_muR/M_PI) << endl;
-		sumgg+=matrix_elements[i]*(1+S1[i]+C1)*wide_soft[i];
+		//cout << "matrix_elements[" << i << "]=" << matrix_elements[i] << " wide_soft[" << i << "]" << wide_soft[i] << "S1 " << S1[i] << " S1/(alphas_muR/pi) " << S1[i]/(alphas_muR/M_PI) << endl;
+		sumgg+=matrix_elements[i]*((1+S1[i]+C1)*ONLY_SF+SF)*wide_soft[i];
 	}
 	//cout << "Tr[H*Ubar*S*U]= " << sumgg << endl;
 	//cout << "cusp_factor=" << cusp_factor << endl;
@@ -182,12 +196,13 @@ complex<double> gg_res_abs(complex<double> N, vector<double*> mom){
 											3.*res_factor_exp,
 											0.,
 											0.};
-			complex<double> cusp_expanded = 1.+delidelj_exp(N,A1g);
+			complex<double> cusp_expanded = 1.*cusp_piece_LO+delidelj_exp(N,A1g)*cusp_piece_NLO;
 			complex<double> sumgg_exp = 0;
 			for(int i=0; i<gghard.ncol;i++)
 			{
-				sumgg_exp+=matrix_elements[i]*(cusp_expanded+wide_soft_exp[i]+S1[i]+C1);
+				sumgg_exp+=matrix_elements[i]*((cusp_expanded+wide_soft_exp[i]*wide_soft_piece+S1[i]*s1_piece+C1*c1_piece)*ONLY_SF + SF*b0_piece);
 			}
+			if (NLL_truncated) return sumgg_exp;
 			return result - sumgg_exp;
 	}
 	return result;

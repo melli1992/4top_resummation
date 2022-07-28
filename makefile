@@ -38,9 +38,17 @@ RESUM_OBJS := $(RESUM_OBJS) src/resum/resum_4top.o
 4top_program := $(RESUM_OBJS) 
 4top_program := $(4top_program) programs/4top_run.o 
 
+
+4top_run_examine_scales := $(RESUM_OBJS) 
+4top_run_examine_scales := $(4top_run_examine_scales) programs/4top_run_examine_scales.o 
+
 #PDFfits
 PDF_program := $(RESUM_OBJS) programs/make_mellin_pdf.o
 
+
+4top_run_examine_scales: $(4top_run_examine_scales)
+	g++ -o 4top_examine_scales $(4top_run_examine_scales) $(CXXFLAGS) $(LDFLAGS) -lgsl -lgslcblas -lm  \
+	    -lcuba -lLHAPDF -lgfortran -lboost_program_options
 
 4top_program: $(4top_program)
 	g++ -o 4top $(4top_program) $(CXXFLAGS) $(LDFLAGS) -lgsl -lgslcblas -lm  \
