@@ -60,7 +60,7 @@ PDF: $(PDF_program)
 # -- Utility rules --
 
 # all: builds all binaries
-all: 4top_program
+all: 4top_program 4top_run_examine_scales
 
 # clean: remove all generated files
 clean:

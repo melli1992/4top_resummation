@@ -65,6 +65,7 @@ int main(int argc, char* argv[]){
 	//ISLL  = 1, ISNLL = 0, include_S1 = false, include_C1 = false;
 	//string homedir = "4top_26052022";
 	ofstream output;
+	full_sad      = true;
 	NLL_truncated = true;
 	expansion     = true;
 	ONLY_SF = 1;

@@ -59,7 +59,7 @@ int main(int argc, char* argv[]){
 	for (std::unordered_map<double, std::vector<std::vector<double>>>::iterator it=fitcoeff.begin(); it!=fitcoeff.end(); ++it)
 	muF_values_pdf.push_back((double) it->first);
 	sort(muF_values_pdf.begin(),muF_values_pdf.end());
-	full_sad = false;
+	full_sad = true;
 	include_gg = false;
 	include_qqbar = true;
 	//////////////////////////////////////////////
@@ -135,9 +135,9 @@ int main(int argc, char* argv[]){
 						muF = closest(muF_values_pdf, muF);
 						//muR = closest(muF_values_pdf, muR);
 					}
-					if(muR == muF){
-						continue;
-					}
+					// if(muR == muF){
+					// 	continue;
+					// }
 					update_defaults();
 					out_result = call_vegas(init_vegas_4top(method),params, true, true);
 					cout << "Res: " << out_result.res << " " << out_result.err << endl;

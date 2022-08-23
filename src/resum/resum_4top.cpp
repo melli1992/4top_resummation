@@ -152,7 +152,11 @@ complex<double> qq_res_full_sad(complex<double> N, vector<double*> mom){
 	Eigen::Matrix<complex<double>, 6, 6> SR_NLO = (ces.eigenvectors().adjoint()) * Stilde_NLO                        * (ces.eigenvectors());
 	
 	// checks
-	Eigen::Matrix<complex<double>, 6, 6> HR_SR = HR*(SR_LO + SR_NLO);
+	// Eigen::Matrix<complex<double>, 6, 6> HR_SR = HR*(SR_LO + SR_NLO);
+	// redefine HR_SR 
+	Eigen::Matrix<complex<double>, 6, 6> HR_SR_LO  = HR*SR_LO;
+	Eigen::Matrix<complex<double>, 6, 6> HR_SR_NLO = HR*SR_NLO;
+		 	
 	// cout << "========" << endl;
     // cout << "The eigenvalues of sad are:" << endl << ces.eigenvalues() << endl;
     // cout << "The eigenvalues of sad are:" << endl << ces.eigenvalues()[0] << endl;
@@ -175,15 +179,12 @@ complex<double> qq_res_full_sad(complex<double> N, vector<double*> mom){
 	
 	// handle the colour part
 	for(int i=0; i<size_qqhard;i++){
-	  sumqq+=HR_SR(i,i)*((1+C1)*ONLY_SF+SF)*exp(wide_soft*(2.*real(ces.eigenvalues()[i])));
+	  sumqq+=(HR_SR_LO(i,i)*((1+C1)*ONLY_SF+SF) + HR_SR_NLO(i,i)*ONLY_SF)*exp(wide_soft*(2.*real(ces.eigenvalues()[i])));
 	}
 	complex<double> result = sumqq*cusp_factor;
 	//compute pure correction on top of NLO
 	if(expansion){
-			// redefine HR_SR 
-			Eigen::Matrix<complex<double>, 6, 6> HR_SR_LO  = HR*SR_LO;
-			Eigen::Matrix<complex<double>, 6, 6> HR_SR_NLO = HR_SR - HR_SR_LO;
-		 	complex<double> wide_soft_exp = -ISNLL*alphas_muR*log(N)/(M_PI);
+			complex<double> wide_soft_exp = -ISNLL*alphas_muR*log(N)/(M_PI);
 			complex<double> cusp_expanded = 1.*cusp_piece_LO+delidelj_exp(N,A1q)*cusp_piece_NLO;
 			complex<double> sumqq_exp = 0;
 			for(int i=0; i<size_qqhard;i++)

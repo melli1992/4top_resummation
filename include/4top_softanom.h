@@ -72,7 +72,7 @@ class kinematic_invariants {
 
 
     void fill_beta_and_angles_XVij(vector<double> & p1, vector<double> & p2, vector<double> & p3, vector<double> & p4, vector<double> & p5, vector<double> & p6){
-        std::cout << p1[0] << std::endl;
+        //std::cout << p1[0] << std::endl;
         beta3 = sqrt(1 - dot(p3, p3)/pow2(p3[0]));
         beta4 = sqrt(1 - dot(p4, p4)/pow2(p4[0]));
         beta5 = sqrt(1 - dot(p5, p5)/pow2(p5[0]));
@@ -121,36 +121,36 @@ class kinematic_invariants {
         vi_jT = vijT(beta5, beta6, c56, X56);
         v56T  = vi_jT[0];
         v65T  = vi_jT[1];
-        std::cout << "beta3 = " << beta3 << "\n"
-                  << "beta4 = " << beta4 << "\n"
-                  << "beta5 = " << beta5 << "\n"
-                  << "beta6 = " << beta6 << "\n"
-                  << "c13   = " << c13   << "\n"
-                  << "c14   = " << c14   << "\n"
-                  << "c15   = " << c15   << "\n"
-                  << "c16   = " << c16   << "\n"
-                  << "c23   = " << c23   << "\n"
-                  << "c24   = " << c24   << "\n"
-                  << "c25   = " << c25   << "\n"
-                  << "c26   = " << c26   << "\n"
-                  << "c34   = " << c34   << "\n"
-                  << "c35   = " << c35   << "\n"
-                  << "c36   = " << c36   << "\n"
-                  << "c45   = " << c45   << "\n"
-                  << "c46   = " << c46   << "\n"
-                  << "c56   = " << c56   << "\n"
-                  << "X34   = " << X34   << "\n"
-                  << "X35   = " << X35   << "\n"
-                  << "X36   = " << X36   << "\n"
-                  << "X45   = " << X45   << "\n"
-                  << "X46   = " << X46   << "\n"
-                  << "X56   = " << X56   << "\n"
-                  << "v34   = " << v34   << "\n"
-                  << "v35   = " << v35   << "\n"
-                  << "v36   = " << v36   << "\n"
-                  << "v45   = " << v45   << "\n"
-                  << "v46   = " << v46   << "\n"
-                  << "v56   = " << v56   << "\n" << std::endl;
+        // std::cout << "beta3 = " << beta3 << "\n"
+        //           << "beta4 = " << beta4 << "\n"
+        //           << "beta5 = " << beta5 << "\n"
+        //           << "beta6 = " << beta6 << "\n"
+        //           << "c13   = " << c13   << "\n"
+        //           << "c14   = " << c14   << "\n"
+        //           << "c15   = " << c15   << "\n"
+        //           << "c16   = " << c16   << "\n"
+        //           << "c23   = " << c23   << "\n"
+        //           << "c24   = " << c24   << "\n"
+        //           << "c25   = " << c25   << "\n"
+        //           << "c26   = " << c26   << "\n"
+        //           << "c34   = " << c34   << "\n"
+        //           << "c35   = " << c35   << "\n"
+        //           << "c36   = " << c36   << "\n"
+        //           << "c45   = " << c45   << "\n"
+        //           << "c46   = " << c46   << "\n"
+        //           << "c56   = " << c56   << "\n"
+        //           << "X34   = " << X34   << "\n"
+        //           << "X35   = " << X35   << "\n"
+        //           << "X36   = " << X36   << "\n"
+        //           << "X45   = " << X45   << "\n"
+        //           << "X46   = " << X46   << "\n"
+        //           << "X56   = " << X56   << "\n"
+        //           << "v34   = " << v34   << "\n"
+        //           << "v35   = " << v35   << "\n"
+        //           << "v36   = " << v36   << "\n"
+        //           << "v45   = " << v45   << "\n"
+        //           << "v46   = " << v46   << "\n"
+        //           << "v56   = " << v56   << "\n" << std::endl;
     }
     vector<double> vijT(double & betai, double & betaj, double & cij, double & Xij){
         double sqrt_Xij = sqrt(Xij); 
@@ -166,12 +166,12 @@ class kinematic_invariants {
         L45 = Lij_real(beta4, beta5, X45, v45, v45T, v54T);
         L46 = Lij_real(beta4, beta6, X46, v46, v46T, v64T);
         L56 = Lij_real(beta5, beta6, X56, v56, v56T, v65T);
-        std::cout << "L34   = " << L34 << "\n"
-                  << "L35   = " << L35 << "\n"
-                  << "L36   = " << L36 << "\n"
-                  << "L45   = " << L45 << "\n"
-                  << "L46   = " << L46 << "\n"
-                  << "L56   = " << L56 << "\n" << std::endl;
+        // std::cout << "L34   = " << L34 << "\n"
+        //           << "L35   = " << L35 << "\n"
+        //           << "L36   = " << L36 << "\n"
+        //           << "L45   = " << L45 << "\n"
+        //           << "L46   = " << L46 << "\n"
+        //           << "L56   = " << L56 << "\n" << std::endl;
     }
     double Lij_real(double & betai, double & betaj, double & Xij, double & vij, double & viT, double & vjT){
         return vij/(2.*sqrt(Xij))*(log((1-pow2(betai))/pow2(viT)) - log((1-pow2(betaj))/pow2(vjT)));
@@ -186,14 +186,14 @@ class kinematic_invariants {
         T24 = Tij_real(c24, beta4);
         T25 = Tij_real(c25, beta5);
         T26 = Tij_real(c26, beta6);
-        std::cout << "T13   = " << T13   << "\n"
-                  << "T14   = " << T14   << "\n"
-                  << "T15   = " << T15   << "\n"
-                  << "T16   = " << T16   << "\n"
-                  << "T23   = " << T23   << "\n"
-                  << "T24   = " << T24   << "\n"
-                  << "T25   = " << T25   << "\n"
-                  << "T26   = " << T26   << "\n" << std::endl;
+        // std::cout << "T13   = " << T13   << "\n"
+        //           << "T14   = " << T14   << "\n"
+        //           << "T15   = " << T15   << "\n"
+        //           << "T16   = " << T16   << "\n"
+        //           << "T23   = " << T23   << "\n"
+        //           << "T24   = " << T24   << "\n"
+        //           << "T25   = " << T25   << "\n"
+        //           << "T26   = " << T26   << "\n" << std::endl;
     }
     double Tij_real(double & cij, double & betaj){
         return -1./2.*log((1 - pow2(betaj))/pow2(1 - betaj * cij)) - 1./2.;

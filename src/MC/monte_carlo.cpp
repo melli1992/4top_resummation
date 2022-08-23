@@ -139,13 +139,14 @@ results call_vegas(functionint integrand, lumni_params params, bool verbal, bool
        	gsl_monte_vegas_integrate (&integrand.G, &integrand.xl[0], &integrand.xu[0], integrand.G.dim, calls, r, s, &res, &err);
 		chisq = gsl_monte_vegas_chisq (s); //gsl_monte_vegas_chisq (s) provides chisq per d.o.f.
 		//gsl_monte_vegas_runval(s, &res, &sigma); //returns raw(unaveraged) values of integral result and error sigma from the most recent iteration of algorithm
+		std::cout << "Iter: " << n_iter << " with k = " << k << std::endl;
 		display_results("Intermediate step - " ,res, err, chisq);
 		n_iter++;
 		if(n_iter > MAX_ITER)
 			{minerr = minerr*10;
 			 n_iter = 0;
 			 k+=1;}
-		if(k>3){break;}
+		if(k>2){break;}
 
        }
        while (((isnan(res))||(fabs (chisq - 1.0) > 0.2)||(fabs (err/res) > minerr)));
