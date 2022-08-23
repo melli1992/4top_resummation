@@ -12,7 +12,6 @@
 #include <sstream>
 #include "inout.h"
 #include "4top_vegas.h"
-#include "4top_softanom.h"
 using namespace std;
 
 
@@ -59,22 +58,23 @@ int main(int argc, char* argv[]){
 	for (std::unordered_map<double, std::vector<std::vector<double>>>::iterator it=fitcoeff.begin(); it!=fitcoeff.end(); ++it)
 	muF_values_pdf.push_back((double) it->first);
 	sort(muF_values_pdf.begin(),muF_values_pdf.end());
-	full_sad = false;
-	include_gg = false;
-	include_qqbar = true;
+
 	//////////////////////////////////////////////
 	/// creating the output file
 	//////////////////////////////////////////////
 	//ISLL  = 1, ISNLL = 0, include_S1 = false, include_C1 = false;
 	//string homedir = "4top_26052022";
 	ofstream output;
-	//include_S1 = false; include_C1 = false;
-	string homedir = "4top_full_sad";//"4top_additional_scale_piece_13TeV"; //"4top_17062022";
+	NLL_truncated = true;
+	expansion     = true;
+	ONLY_SF = 1;
+	
+	string homedir = "4top_230822_nondiagonalpieces";//"4top_each_scale_piece_individually";//"4top_additional_scale_piece_13TeV"; //"4top_17062022";
 	//string q_str = "results/"+homedir+"/output_4top_"+method+"_LL_";
 	string q_str = "results/"+homedir+"/output_4top_"+method+"_";
 	if((include_gg == true) and (include_qqbar==false))  q_str += "gg_";
 	if((include_gg == false) and (include_qqbar==true))  q_str += "qq_";
-	if(expansion) q_str += "expanded_";
+	if(expansion && NLL_truncated) q_str += "NLLtruncated_";
 	if(INCEULER) q_str += "nbaryes_";
 	else q_str += "nbarno_";
 	if(include_S1) q_str += "S1yes_";
@@ -82,67 +82,38 @@ int main(int argc, char* argv[]){
 	if(fitPDF) q_str+= "fitpdf_";
 	if(!fitPDF) q_str+= "realpdf_";
 	if(ONLY_SF==0) q_str+= "ONLY_SF_";
+	if     ((cusp_piece_LO == 1) && (cusp_piece_NLO == 0) && (wide_soft_piece== 0) && (s1_piece == 0) && (c1_piece == 0) && (b0_piece == 0)) q_str+= "cLO_";
+	else if((cusp_piece_LO == 0) && (cusp_piece_NLO == 1) && (wide_soft_piece== 0) && (s1_piece == 0) && (c1_piece == 0) && (b0_piece == 0)) q_str+= "cNLO_";
+	else if((cusp_piece_LO == 0) && (cusp_piece_NLO == 0) && (wide_soft_piece== 1) && (s1_piece == 0) && (c1_piece == 0) && (b0_piece == 0)) q_str+= "ws_";
+	else if((cusp_piece_LO == 0) && (cusp_piece_NLO == 0) && (wide_soft_piece== 0) && (s1_piece == 1) && (c1_piece == 0) && (b0_piece == 0)) q_str+= "s1_";
+	else if((cusp_piece_LO == 0) && (cusp_piece_NLO == 0) && (wide_soft_piece== 0) && (s1_piece == 0) && (c1_piece == 1) && (b0_piece == 0)) q_str+= "c1_";
+	else if((cusp_piece_LO == 0) && (cusp_piece_NLO == 0) && (wide_soft_piece== 0) && (s1_piece == 0) && (c1_piece == 0) && (b0_piece == 1)) q_str+= "b0_";
+	else if((cusp_piece_LO == 1) && (cusp_piece_NLO == 1) && (wide_soft_piece== 1) && (s1_piece == 1) && (c1_piece == 1) && (b0_piece == 1)) q_str+= "";
+	else{
+		cout << "Cannot be! Look at turning on all the pieces" << endl;
+		exit(0);
+	}
+	
 	q_str += "CMP_"+to_string_round(CMP)+"_phiMP_"+to_string_round(phiMP)+"_muR_"+to_string_round(muR)+"_mt_"+to_string_round(mt);
 	output.open(q_str.c_str()); 
 	cout << "Opening the file " << q_str << endl;
 	//////////////////////////////////////////////
 	/// code for total xsec
 	//////////////////////////////////////////////
-	//cout << "CMP = " << CMP << " phiMP = " << phiMP << endl;
-	//output << "CMP = " << CMP << " phiMP = " << phiMP << endl;
-	
-	//vector<double> top_quark_values = {100,125,150,172.5, 173, 175,200,225,250,275,300,350,400,450,500,550,625,750};
-	//for(int k = 0; k < 19; k++){
 		mt2 = pow(mt,2);
 		Q2 = pow(4.*mt,2); Q = sqrt(Q2);
 		tau = Q2/S2;
-		//vector<double> scales = {muR};
 		vector<double> scales = {mt, 2*mt, 4*mt};
-		/*muF = scales[0];
-		muR = scales[0];
-		if(fitPDF){
-			muF = closest(muF_values_pdf, muF);
-			muR = closest(muF_values_pdf, muR);
-		}*/
 		
 		update_defaults();
-		/*                 
-		double s = 8134873.7525206236 ;
-		double s12 = 823711.00265290437 ;
-		double s34 = 495636.87293792958;
-		double thetaCM = 1.9619335642393936;
-		double phiCM = 0.0;
-		double theta12 = 2.4125718167750776;
-		double phi12 = 2.1718290474314728 ;
-		double theta34 = 0.69835376399455884 ;
-		double phi34 = 1.1490681137878767;
-		complex<double> N = 1.7682287539440571+I*0.23177121566281500;
 		
-		test_res(s, s12, s34, thetaCM, theta12, theta34, phiCM, phi12, phi34, N);*/
-		// exit(0);
-	//	vector<double> CMPval = {1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5};
-	//	vector<double> phival = {2./3.*M_PI, 0.70833333333*M_PI, 3./4.*M_PI};
-	//	for(int k = 0; k < 3; k++){
-	//		phiMP = phival[k];
-	//		for(int j = 0; j < 11; j++){
-	//			if((method == "LO") && (k > 0 || j > 0)) continue;
-	//			CMP = CMPval[j];
-	
-					for(int scalF = 0; scalF < 3; scalF++){
-					muF = scales[scalF];
-					//muR = scales[scal];
-					if(fitPDF){
-						muF = closest(muF_values_pdf, muF);
-						//muR = closest(muF_values_pdf, muR);
-					}
-					if(muR == muF){
-						continue;
-					}
-					update_defaults();
-					out_result = call_vegas(init_vegas_4top(method),params, true, true);
-					cout << "Res: " << out_result.res << " " << out_result.err << endl;
-					output << "CMP = " << CMP << " phiMP = " << phiMP << " mt = " << mt << ", muF = " << muF << ", muR = " << muR << " qqbar_included = " << include_qqbar << " gg_included = " << include_gg << " expanded = " << expansion << " includeS1 = " << include_S1 << " includeC1 = " << include_C1 << " Res = " << out_result.res << " " << out_result.err << endl;
-					}
+		for(int scalF = 0; scalF < 3; scalF++){
+			muF = scales[scalF];
+			update_defaults();
+			out_result = call_vegas(init_vegas_4top(method),params, true, true);
+			cout << "Res: " << out_result.res << " " << out_result.err << endl;
+			output << "CMP = " << CMP << " phiMP = " << phiMP << " mt = " << mt << ", muF = " << muF << ", muR = " << muR << " qqbar_included = " << include_qqbar << " gg_included = " << include_gg << " expanded = " << expansion << " includeS1 = " << include_S1 << " includeC1 = " << include_C1 << " Res = " << out_result.res << " " << out_result.err << endl;
+		}
 				
 		
 	output.close();

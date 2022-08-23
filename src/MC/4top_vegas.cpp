@@ -496,7 +496,10 @@ std::vector<complex<double>> xsec_res(complex<double> N, double rho, double s12,
 	vector<double*> mom = get_momenta(s, s12, s34, thetaCM, phiCM, theta12, phi12, theta34, phi34);
 	complex<double> Mqqbar2 = 0.;
     complex<double> Mgg2 = 0.;
-	if(include_qqbar) Mqqbar2 = qq_res_abs(N+1., mom);
+	if(include_qqbar){
+		if(full_sad) Mqqbar2 = qq_res_full_sad(N+1., mom);
+		else         Mqqbar2 = qq_res_abs(N+1., mom);
+	}
 	if(include_gg) Mgg2 = gg_res_abs(N+1.,mom);
 
 	result[0] = constants*Mqqbar2;

@@ -74,6 +74,7 @@ double INCEULER(1.);
 bool include_gg = true, include_qqbar=true;
 bool include_C1 = true, include_S1 = true;
 double ONLY_SF(0);
+bool full_sad = false;
 
 // anomalous dimensions for dQCD
 double A1q(CF); // 1405.4827 eq. 12

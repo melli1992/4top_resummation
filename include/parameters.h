@@ -83,6 +83,7 @@ extern bool include_qqbar;
 extern bool include_C1;
 extern bool include_S1;
 extern std::string method;
+extern bool full_sad;
 
 //process
 extern qq_process qqhard;

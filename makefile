@@ -15,7 +15,7 @@ CXXFLAGS := -Wall -Wextra -Wno-ignored-qualifiers -Wno-unused-parameter -O3 -std
 CXXFLAGS := $(CXXFLAGS) -I$(LHAPDF)/include -I$(LOOPTOOLS)/include
 CXXFLAGS := $(CXXFLAGS) -I$(CUBA)/include
 # Include folders for project
-CXXFLAGS := $(CXXFLAGS) -I./include
+CXXFLAGS := $(CXXFLAGS) -I./include -I/home/mbeekveld/eigen-3.4.0/build_dir/include/eigen3
 
 # -- Object file lists for the various target binaries -- 
 # Splitting this off allows easier writing of utility tasks
@@ -33,7 +33,7 @@ RESUM_OBJS := $(RESUM_OBJS) src/utilities/inout.o
 #hard functions
 RESUM_OBJS := $(RESUM_OBJS) src/qqbar/qq_helamps.o src/qqbar/qq_process.o src/gg/gg_helamps.o src/gg/gg_process.o
 #resumation
-RESUM_OBJS := $(RESUM_OBJS) src/resum/resum_4top.o 
+RESUM_OBJS := $(RESUM_OBJS) src/resum/resum_4top.o  src/resum/4top_softanom.o  
 
 4top_program := $(RESUM_OBJS) 
 4top_program := $(4top_program) programs/4top_run.o 

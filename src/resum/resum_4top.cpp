@@ -1,4 +1,3 @@
-//#include "4top_softanom.h" //not needed for now
 #include <bits/stdc++.h>
 #include <stdlib.h>
 #include <gsl/gsl_math.h>
@@ -8,8 +7,13 @@
 #include "resum_4top.h"
 #include "qq_process.h"
 #include "gg_process.h"
+#include "4top_softanom.h"
 
 using namespace std;
+
+// make sure this is not reinitialised every time
+Eigen::ComplexEigenSolver<Eigen::Matrix<complex<double>,6,6>> ces;
+    
 
 // LP LL function h0 (or g1) hep-ph/0306211 eqn 39 (note that gammaE is not part there of lambda and the factor 2 (as they have 2*h0 = g1!) or 1905.11771 eqn 6
 complex<double> g1_M2(double A1,complex<double>lambda){
@@ -106,6 +110,96 @@ complex<double> qq_res_abs(complex<double> N, vector<double*> mom){
 	}
 	return result;
 }
+
+
+complex<double> qq_res_full_sad(complex<double> N, vector<double*> mom){
+
+	double INCeuler = 0.;
+	// if(INCEULER == 0) {INCeuler = 1.;}
+
+	complex<double> lambda = b0*alphas_muR*log(N);
+	qqhard.setMomenta(mom);
+	// Evaluate matrix element
+	qqhard.sigmaKin();
+	const double* matrix_elements = qqhard.getMatrixElements();
+	// Do the resummation
+	complex<double> wide_soft   = ISNLL*log(1.-2.*lambda)/(2.*M_PI*b0);
+	complex<double> cusp_factor = exp(2.*(1./alphas_muR*ISLL*g1_M2(A1q,lambda)+ISNLL*g2_M2(A1q,A2q,lambda)));
+	complex<double> sumqq = 0;
+	double C1 = 0, SF = 0;
+	int size_qqhard = qqhard.ncol;
+	if(include_C1){
+		C1 = ISNLL*C1_coefficient(CF, gamma_q)*ONLY_SF;
+		SF = ISNLL*scale_coefficient(CF, gamma_q);
+	}
+	kinematic_invariants KI(mom);
+	Eigen::Matrix<complex<double>, 6, 6> sad     = get_Gamma_R_eigen(KI);
+	ces.compute(sad);
+	// we have
+	// GammaR = Rinv.Gamma.R
+	// ces.eigenvalues() = ces.eigenvectors().inverse() * sad * ces.eigenvectors()
+	// HR = Rinv* H * (Rinv)^dagger
+	// (dagger = conjugate transpose = adjoint)
+	// SR = R^dagger * S * R
+	// need Tr[HR*SR]
+	Eigen::DiagonalMatrix<complex<double>, 6> Hard(matrix_elements[0], matrix_elements[1], matrix_elements[2],
+												   matrix_elements[3], matrix_elements[4], matrix_elements[5] );
+	Eigen::DiagonalMatrix<complex<double>, 6> Stilde_LO(1,1,1,1,1,1);
+	Eigen::Matrix<complex<double>, 6, 6> Stilde_NLO = get_S1tilde(KI);
+
+	Eigen::Matrix<complex<double>, 6, 6> HR     = (ces.eigenvectors().inverse()) * Hard.diagonal().asDiagonal()      * (ces.eigenvectors().inverse()).adjoint();
+	Eigen::Matrix<complex<double>, 6, 6> SR_LO  = (ces.eigenvectors().adjoint()) * Stilde_LO.diagonal().asDiagonal() * (ces.eigenvectors());
+	Eigen::Matrix<complex<double>, 6, 6> SR_NLO = (ces.eigenvectors().adjoint()) * Stilde_NLO                        * (ces.eigenvectors());
+	
+	// checks
+	Eigen::Matrix<complex<double>, 6, 6> HR_SR = HR*(SR_LO + SR_NLO);
+	// cout << "========" << endl;
+    // cout << "The eigenvalues of sad are:" << endl << ces.eigenvalues() << endl;
+    // cout << "The eigenvalues of sad are:" << endl << ces.eigenvalues()[0] << endl;
+    // cout << "sad = V * D * V^(-1) = " << endl
+    //     << ces.eigenvectors() * ces.eigenvalues().asDiagonal() * ces.eigenvectors().inverse() << endl;
+	// cout << "H " << Hard.diagonal() << endl;
+	// cout << "S " << Stilde.diagonal() << endl;
+	// cout << "HR " << HR << endl;
+	// cout << "SR " << SR << endl;
+	// cout << "HR_SR " << HR_SR << endl;
+	// complex<double> sum_HR_SR;
+	// complex<double> sum_H_S;
+	// for(int i = 0; i < size_qqhard; i++){
+	// 	//cout << "HR_SR " << HR_SR.diagonal()[i] << endl;
+	// 	sum_HR_SR +=  HR_SR.diagonal()[i];
+	// 	sum_H_S   +=  Hard.diagonal()[i];
+	// }
+	// // indeed the same up to complex part!
+	// std::cout << "sum_HR_SR " << sum_HR_SR << " sum_H_S " << sum_H_S << endl;
+	
+	// handle the colour part
+	for(int i=0; i<size_qqhard;i++){
+	  sumqq+=HR_SR(i,i)*((1+C1)*ONLY_SF+SF)*exp(wide_soft*(2.*real(ces.eigenvalues()[i])));
+	}
+	complex<double> result = sumqq*cusp_factor;
+	//compute pure correction on top of NLO
+	if(expansion){
+			// redefine HR_SR 
+			Eigen::Matrix<complex<double>, 6, 6> HR_SR_LO  = HR*SR_LO;
+			Eigen::Matrix<complex<double>, 6, 6> HR_SR_NLO = HR_SR - HR_SR_LO;
+		 	complex<double> wide_soft_exp = -ISNLL*alphas_muR*log(N)/(M_PI);
+			complex<double> cusp_expanded = 1.*cusp_piece_LO+delidelj_exp(N,A1q)*cusp_piece_NLO;
+			complex<double> sumqq_exp = 0;
+			for(int i=0; i<size_qqhard;i++)
+			{
+				sumqq_exp+=(HR_SR_LO(i,i)    * cusp_expanded*ONLY_SF
+				            + HR_SR_LO(i,i)  * wide_soft_exp*(2.*real(ces.eigenvalues()[i]))*ONLY_SF*wide_soft_piece
+							+ HR_SR_LO(i,i)  * C1*ONLY_SF*c1_piece
+							+ HR_SR_NLO(i,i) * ONLY_SF*s1_piece
+							+ HR_SR_LO(i,i)  * SF*b0_piece);
+			}
+			if (NLL_truncated) return sumqq_exp;
+			return result - sumqq_exp;
+	}
+	return result;
+}
+
 
 complex<double> gg_res_abs(complex<double> N, vector<double*> mom){
 
